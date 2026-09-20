@@ -1,5 +1,5 @@
 import type { Page } from '@inertiajs/core'
-import type { ResolvedComponent } from '@inertiajs/react'
+import type { ResolvedComponent } from '@inertiajs/vue3'
 
 /** The signed-in user, as `app/inertia.py:current_user` serialises them. */
 export interface AuthUser {
@@ -29,15 +29,17 @@ export interface SharedProps {
 /**
  * A page module, as `import.meta.glob` hands it back.
  *
- * `default` is Inertia's own component type rather than a hand-written
- * type: it already carries the optional `layout` property, and the resolver
- * in app.tsx is typed against exactly this. Narrowing it — to
- * `ComponentType<never>`, say — makes the assignment to `createInertiaApp`
- * fail with an overload error that names variance on `getDerivedStateFromProps`
- * and never mentions the actual problem.
+ * `default` is the Vue component. `layout` is what the entry reads to wrap a
+ * page in the shared Layout — it is typed `ResolvedComponent` because that is
+ * exactly what `@inertiajs/vue3` hands `createInertiaApp`'s `resolve` callback.
+ *
+ * `layout` is what the entry mutates when it assigns a default, so it starts
+ * out optional. Pages that set their own layout (check the shared shell first)
+ * declare it here.
  */
 export interface PageModule {
   default: ResolvedComponent
+  layout?: (children: ResolvedComponent) => ResolvedComponent
 }
 
 export type AppPage<P = Record<string, unknown>> = Page<SharedProps & P>
