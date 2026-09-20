@@ -1,30 +1,33 @@
 {
   "compilerOptions": {
-    /* Language and module settings. */
     "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "bundler",
     "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true,
 
-    /* Strictness — the starter is deliberately strict. */
-    "strict": true,
-
-    /* Paths. `@/` maps to js/, and `@/views` to views/; the entry and the
-       page components both rely on these two aliases. */
+    /* Runs through vue-tsc, not tsc: the modules to type-check are the Vue
+       twin's (`*.vue` + `js/*.ts`), so there is no parser/JSX config here. */
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./js/*"],
-      "@views/*": ["./views/*"]
+      "@/*": ["js/*"],
+      "@views/*": ["views/*"]
     },
 
-    /* Vue single-file components compile through vue-tsc. */
-    "jsx": "preserve",
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
 
-    /* Emit nothing — Vite is the only compiler and it strips types. */
-    "noEmit": true
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    "types": ["vite/client", "node"]
   },
   "include": ["js", "views", "vite.config.ts"]
 }
