@@ -1,59 +1,40 @@
-import { fileURLToPath } from 'node:url'
-import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePlugin } from 'vite-plugin-sillo-inertia'
+import vue from '@vitejs/plugin-vue'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
+import { fileURLToPath, URL } from 'node:url'
+import type { ConfigEnv } from 'vite'
 
-export default defineConfig({
-  resolve: {
-    alias: {
-      // `@/js/ui`, `@/views/Layout`. Kept in step with the `paths` entry in
-      // tsconfig.json: Vite resolves at build time and tsc only type-checks,
-      // so neither one knows about the other and both have to be told.
-      '@': fileURLToPath(new URL('.', import.meta.url)),
+/** The append-only tail of the starter's per-twin config: */
+export default defineConfig(() => {
+  const isProduction = process.env.NODE_ENV === 'production'
+
+  return {
+    root: '.',
+    publicDir: 'public',
+    plugins: [
+      // The shared adapter in app/inertia.py hands the entry and the shell its
+      // tags; this plugin only exists to mirror how the twin does it.
+      VitePlugin({ entry: 'js/main.ts', rootId: 'app' }),
+      vue(),
+      viteStaticCopy({
+        targets: [{ src: 'public/*', dest: '.' }],
+      }),
+    ],
+
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./js', import.meta.url)),
+      },
     },
-  },
 
-  // Tailwind v4 is a Vite plugin rather than a PostCSS step, so there is no
-  // postcss.config.js and no tailwind.config.js. Content scanning is
-  // automatic; the design tokens live in js/app.css under @theme.
-  plugins: [tailwindcss(), react()],
-
-  build: {
-    // Where the Python side looks. app/inertia.py reads
-    // static/build/.vite/manifest.json, and app/bootstrap.py serves
-    // static/build/assets at /assets. Change this and change both.
-    outDir: 'static/build',
-    emptyOutDir: true,
-
-    // Without this there is no manifest, and a production render has no way
-    // to find the hashed filenames — the page comes back with no script tag
-    // and no error.
-    manifest: true,
-
-    rollupOptions: {
-      // This exact string is the key written into the manifest and the path
-      // the dev server serves. It must match ENTRY in app/inertia.py; if the
-      // two drift, development still works and production silently ships a
-      // page with no JavaScript.
-      input: 'js/main.tsx',
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      manifest: 'manifest.json',
+      rollupOptions: {
+        input: 'js/main.ts',
+      },
     },
-  },
-
-  server: {
-    port: 5173,
-    strictPort: true,
-
-    // The browser is on the Sillo origin (127.0.0.1:8000) and pulls modules
-    // from this one, which is a cross-origin request. Without CORS the
-    // browser blocks every module and the page renders blank with only a
-    // console error to say so.
-    cors: true,
-
-    // Vite guesses the HMR host from the page, which is the Sillo origin
-    // rather than this one. Stating it means hot reload connects instead of
-    // failing back to a full page refresh on every save.
-    hmr: {
-      host: 'localhost',
-    },
-  },
+  }
 })
