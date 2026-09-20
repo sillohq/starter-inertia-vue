@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import Any
 
 from sillo.core.http import Request
-from sillo_inertia import Inertia, vite_react
+from sillo_inertia import Inertia, vite_vue
 
 from app.config import BASE_DIR, config
 
@@ -28,31 +28,32 @@ MANIFEST = BUILD_DIR / ".vite" / "manifest.json"
 #: The client entry, as a path relative to the project root.
 #:
 #: This exact string is the key Vite writes into the manifest, and the path the
-#: dev server serves from. It has to match ``build.rollupOptions.input`` in
+#: dev server serves. It has to match ``build.rollupOptions.input`` in
 #: vite.config.ts; if the two drift, development still works and production
 #: renders a page with no JavaScript.
-ENTRY = "js/main.tsx"
+ENTRY = "js/main.ts"
 
 
 def build_inertia() -> Inertia:
     """Construct the adapter for this project."""
     return Inertia(
-        # Attached in bootstrap rather than here. Passing `app=` would install
-        # the middleware at construction time, which puts it at the wrong place
-        # in a chain that is ordered deliberately.
+        # Attached in bootstrap rather than here. Passing ``app=`` would keep
+        # this module free of the middleware/dependency wiring, and installing
+        # the middleware at construction time puts it at an arbitrary point in
+        # the chain.
         root_view=BASE_DIR / "root.html",
         # An absolute base_dir. Left unset the adapter derives one by walking
         # three parents up from the root view, which is correct only when the
-        # process was started from the project root.
+        # process is started from the project root.
         base_dir=BASE_DIR,
         version=config.asset_version,
         root_id="app",
         # Substituted into root.html as `{{ app_name }}`.
-        # View data and props are different channels: props reach React, view
+        # View data and props are different channels: props reach Vue, view
         # data only ever reaches the HTML shell. The document title belongs in
         # the shell, so that a page has a title before any JavaScript runs.
         view_data={"app_name": config.app_name},
-        vite=vite_react(
+        vite=vite_vue(
             entry=ENTRY,
             dev_server=config.vite_dev_server,
             manifest_path=MANIFEST,
@@ -73,7 +74,7 @@ def share_globals(inertia: Inertia) -> None:
     inertia.share(
         app_name=config.app_name,
         auth=lambda request: {"user": current_user(request)},
-        # Every page reads `errors`, so it must always be present — a React
+        # Every page reads `errors`, so it must always be present — a Vue
         # component that does `errors.email` cannot be written defensively at
         # every use site. Consumed here, which is what makes it flash: the
         # values survive exactly one render and are cleared as they are read.
@@ -91,7 +92,7 @@ def current_user(request: Request) -> dict[str, Any] | None:
     Returns a dict rather than the model. Props are serialised to JSON and
     handed to the browser, so anything on the model that is not meant to be
     public — the password hash above all — must not be in what this returns.
-    Listing the fields explicitly is what guarantees that; a `to_dict()` would
+    Listing the fields explicitly is what guarantees that; a ``to_dict()`` would
     quietly start shipping every column you add later.
     """
     user = getattr(request, "user", None)
