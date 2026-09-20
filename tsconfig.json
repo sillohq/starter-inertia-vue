@@ -1,39 +1,30 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    /* Language and module settings. */
+    "target": "ES2021",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "jsx": "react-jsx",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
 
+    /* Strictness — the starter is deliberately strict. */
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
 
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
+    /* Paths. `@/` maps to js/, and `@/views` to views/; the entry and the
+       page components both rely on these two aliases. */
+    "paths": {
+      "@/*": ["./js/*"],
+      "@views/*": ["./views/*"]
+    },
+
+    /* Vue single-file components compile through vue-tsc. */
+    "jsx": "preserve",
     "isolatedModules": true,
-    "verbatimModuleSyntax": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
-    // Vite compiles; tsc only ever checks. `npm run typecheck` passes
-    // --noEmit for the same reason.
-    "noEmit": true,
-
-    // `vite/client` gives `import.meta.glob` and `import.meta.env` their
-    // types — without it the glob call in js/main.tsx is an error even though
-    // it compiles fine. `node` is for vite.config.ts, which runs in Node and
-    // imports `node:url` to build the `@` alias below.
-    "types": ["vite/client", "node"],
-
-    // `@/js/ui`, `@/views/Layout`. The matching alias lives in
-    // vite.config.ts — tsc only type-checks and Vite only resolves, so
-    // neither reads the other's copy and both have to agree.
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"]
-    }
+    /* Emit nothing — Vite is the only compiler and it strips types. */
+    "noEmit": true
   },
-  "include": ["js/**/*.ts", "js/**/*.tsx", "views/**/*.tsx", "vite.config.ts"]
+  "include": ["js", "views", "vite.config.ts"]
 }
