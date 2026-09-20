@@ -21,7 +21,7 @@ async def home(request: Request, response: Response):
     return await render(
         "Home",
         {
-            "message": "Sillo on the back, Inertia and React on the front.",
+            "message": "Sillo on the back, Inertia and Vue on the front.",
         },
     )
 
