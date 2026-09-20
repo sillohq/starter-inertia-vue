@@ -1,0 +1,47 @@
+/*
+ * Tailwind, with the palette stated once.
+ *
+ * v4 needs no tailwind.config.js and no PostCSS step — the Vite plugin in
+ * vite.config.ts does both, and content scanning is automatic. What is left
+ * here is the part worth writing down: the two brand colours, and the three
+ * global rules that are not a utility on an element.
+ */
+
+@import 'tailwindcss';
+
+/*
+ * `dark:` follows the OS by default in v4. Add
+ *
+ *     @custom-variant dark (&:where(.dark, .dark *));
+ *
+ * if you would rather drive it from a class you toggle yourself.
+ */
+
+@theme {
+  /*
+   * The neutral scale is Tailwind's own zinc, so it is not restated here.
+   * Only the colours that are this application's rather than the framework's
+   * need naming: everything else is `zinc-*` at the call site.
+   */
+  --color-brand: var(--color-rose-600);
+  --color-brand-strong: var(--color-rose-700);
+}
+
+@layer base {
+  /*
+   * Set on body rather than a wrapper so overscroll shows the right colour
+   * instead of the browser's white. The shell's own height is handled with
+   * min-h-screen in Layout.tsx.
+   */
+  body {
+    @apply bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100;
+  }
+
+  /*
+   * Links inherit their colour by default — the ones that should look like
+   * links say so. Without this every <a> in prose turns blue.
+   */
+  a {
+    @apply text-inherit;
+  }
+}

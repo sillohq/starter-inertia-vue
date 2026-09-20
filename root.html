@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ app_name }}</title>
+
+    <!--
+      Expands to the script and stylesheet tags for the front end: the Vite
+      dev server's client and entry in development, the hashed files named in
+      the build manifest in production. Which one you get is the `dev` flag on
+      vite_react() in app/inertia.py.
+    -->
+    {{ inertia_head }}
+  </head>
+  <body class="h-full">
+    <!--
+      Inertia mounts here. The id has to match `root_id` on the adapter and
+      the `id` createInertiaApp() resolves in js/main.tsx.
+    -->
+    <div id="{{ root_id }}"></div>
+
+    <!--
+      The page object, as a JSON script tag.
+
+      Do not move this onto the div above as `data-page`. That was the Inertia
+      1.x convention; 2.x reads
+      `script[data-page="app"][type="application/json"]` and nothing else, so
+      the older placement boots with a null page and throws
+      "Cannot read properties of null (reading 'component')" from inside
+      createInertiaApp.
+    -->
+    {{ inertia }}
+
+    <noscript>
+      <p style="font: 16px system-ui; padding: 2rem">
+        This application is rendered in the browser and needs JavaScript enabled.
+      </p>
+    </noscript>
+  </body>
+</html>

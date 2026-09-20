@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+
+    // Vite compiles; tsc only ever checks. `npm run typecheck` passes
+    // --noEmit for the same reason.
+    "noEmit": true,
+
+    // `vite/client` gives `import.meta.glob` and `import.meta.env` their
+    // types — without it the glob call in js/main.tsx is an error even though
+    // it compiles fine. `node` is for vite.config.ts, which runs in Node and
+    // imports `node:url` to build the `@` alias below.
+    "types": ["vite/client", "node"],
+
+    // `@/js/ui`, `@/views/Layout`. The matching alias lives in
+    // vite.config.ts — tsc only type-checks and Vite only resolves, so
+    // neither reads the other's copy and both have to agree.
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["js/**/*.ts", "js/**/*.tsx", "views/**/*.tsx", "vite.config.ts"]
+}

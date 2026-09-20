@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # Weekly, because the failure this catches is a new sillo, sillo-inertia or
+  # Inertia release breaking the starter — which happens on their calendar,
+  # not on ours.
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  frontend:
+    name: Front end
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+
+      # A build that emits no manifest renders a page with no script tag and
+      # no error, so the artefact the Python side depends on is asserted
+      # rather than assumed.
+      - name: The manifest exists and names the entry
+        run: |
+          test -f static/build/.vite/manifest.json
+          grep -q 'resources/js/app.tsx' static/build/.vite/manifest.json
+
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+          npm ci
+
+      # Before the tests, not after. tests/test_production_assets.py skips
+      # itself when there is no build, so without this the suite would go
+      # green having never exercised the manifest, the asset URLs or the
+      # static mount — the three things most likely to be quietly wrong.
+      - name: Build the front end
+        run: npm run build
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Test
+        run: uv run pytest -q
+
+      # A skip here means the build step above failed to produce a manifest
+      # and the suite went green without its production coverage.
+      #
+      # Written out rather than piped into grep: `grep -qv skipped` succeeds
+      # whenever *any* line lacks the word, which a pytest run always has, so
+      # it would pass no matter what happened.
+      - name: The production-asset tests actually ran
+        run: |
+          output=$(uv run pytest tests/test_production_assets.py -q --no-header -rs)
+          echo "$output"
+          if echo "$output" | grep -q "skipped"; then
+            echo "::error::The production-asset tests skipped — no build manifest, so the production path was never exercised."
+            exit 1
+          fi
