@@ -32,7 +32,6 @@ function submit() {
         type="email"
         name="email"
         autocomplete="username"
-        :class="input"
         class="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm shadow-sm focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/10"
       />
       <em v-if="form.errors.email" class="text-sm text-red-600">
