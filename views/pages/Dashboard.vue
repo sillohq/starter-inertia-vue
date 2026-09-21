@@ -2,7 +2,7 @@
 import { Head } from '@inertiajs/vue3'
 import type { SharedProps } from '@/types'
 
-defineProps<SharedProps>()
+const { auth } = defineProps<SharedProps>()
 </script>
 
 <template>
