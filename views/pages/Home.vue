@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Head, Link, usePage } from '@inertiajs/vue3'
+import { Head, Link } from '@inertiajs/vue3'
 import type { SharedProps } from '@/types'
 
 const props = defineProps<SharedProps>()
-const { auth, appName, flash } = props
+const { auth, appName } = props
 
 const greeting = computed(() => {
   const user = auth.user
