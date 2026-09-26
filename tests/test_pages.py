@@ -63,7 +63,7 @@ class TestTheFirstVisit:
         html = client.get("/").text
 
         assert "http://localhost:5173/@vite/client" in html
-        assert "http://localhost:5173/js/main.tsx" in html
+        assert "http://localhost:5173/js/main.ts" in html
 
     def test_the_title_comes_from_view_data(self, client):
         """Read from config rather than written out.

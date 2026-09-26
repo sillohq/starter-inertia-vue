@@ -7,10 +7,17 @@ is what runs the ASGI lifespan — which is what opens the database.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 import pytest
+
+# Production-asset tests import app.inertia while pytest collects modules, before
+# any fixture can set an isolated environment. Pin these test-only values here
+# so a developer's shell cannot make collection fail before the suite starts.
+os.environ["APP_ENV"] = "testing"
+os.environ["DEBUG"] = "true"
 
 #: Project packages that read configuration at import time.
 PROJECT_PACKAGES = ("app", "routes", "database")
