@@ -69,7 +69,7 @@ users:  ## List users
 # one printed an error, and you want the HMR output where you can see it.
 dev:  ## Run the application with reload. Run `npm run dev` alongside it.
 	@echo "  remember: npm run dev, in another terminal (VITE_DEV=true)"
-	$(CONSOLE) serve --reload --host $(HOST) --port $(PORT)
+	$(CONSOLE) dev --host $(HOST) --port $(PORT)
 
 serve:  ## Run as it would run in production. Needs `make build` and VITE_DEV=false.
 	$(PY) uvicorn $(APP) --host 0.0.0.0 --port $(PORT) --workers 4
