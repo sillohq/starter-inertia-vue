@@ -11,7 +11,6 @@
 
     /* Runs through vue-tsc, not tsc: the modules to type-check are the Vue
        twin's (`*.vue` + `js/*.ts`), so there is no parser/JSX config here. */
-    "moduleResolution": "bundler",
     "baseUrl": ".",
     "paths": {
       "@/*": ["js/*"],

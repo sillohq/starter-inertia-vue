@@ -3,7 +3,7 @@ import type { Component } from 'vue'
 import { createInertiaApp } from '@inertiajs/vue3'
 import type { PageModule } from './types'
 import Layout from '../views/Layout.vue'
-import '../views/app.css'
+import './app.css'
 
 const appName = document.title || 'Sillo'
 

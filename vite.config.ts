@@ -1,12 +1,13 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
 
 // The Vue twin's build. `render_vite_vue_tags` in app/inertia.py points at the
 // same `manifest.json` this writes, and js/main.ts is the entry the adapter
 // hands the browser.
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), tailwindcss()],
 
   resolve: {
     alias: {
