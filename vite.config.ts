@@ -16,7 +16,8 @@ export default defineConfig({
   },
 
   build: {
-    manifest: 'manifest.json',
+    outDir: 'static/build',
+    manifest: true,
     rollupOptions: {
       input: 'js/main.ts',
     },
